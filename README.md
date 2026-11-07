@@ -1,198 +1,300 @@
 # SNAP DISAPPEAR – Real-Time Avengers Dust VFX ⚡
 
-An advanced, real-time computer vision and visual effects desktop application in Python that recreates the cinematic **Avengers: Infinity War** disintegration effect triggered by snapping your fingers in front of your webcam.
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![OpenCV](https://img.shields.io/badge/OpenCV-5.0+-red.svg?logo=opencv&logoColor=white)](https://opencv.org/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-1.2+-teal.svg?logo=google&logoColor=white)](https://developers.google.com/mediapipe)
+[![PyQt6](https://img.shields.io/badge/GUI-PyQt6-green.svg?logo=qt&logoColor=white)](https://www.riverbankcomputing.com/software/pyqt/)
+[![PyVirtualCam](https://img.shields.io/badge/Stream-PyVirtualCam-purple.svg)](https://github.com/letmaik/pyvirtualcam)
 
-When you snap your fingers, your real body dissolves into thousands of organic, glowing dust, ember, and ash particles that drift away into the wind, leaving your physical room background completely preserved. When you snap again, the particles swirl back and reconstruct your body, smoothly returning you to the live feed.
+A professional, real-time computer vision and visual effects desktop application in Python that recreates the cinematic **Avengers: Infinity War** dust disintegration effect triggered by snapping your fingers in front of your laptop webcam.
+
+When you snap your fingers, your body dynamically disintegrates into thousands of organic, glowing dust, ember, and ash particles that drift away into the wind, leaving your physical room background completely visible and preserved. Snapping again triggers an inward reverse particle vortex that reconstructs your body back into the live video feed.
 
 The application includes direct **Virtual Camera** output (`pyvirtualcam`), allowing you to use this effect live in **Zoom**, **Google Meet**, and **Microsoft Teams**.
 
 ---
 
-## 🌟 Key Features
+## 📸 Visual Showcase & Application States
 
-1. **Biomechanical Finger-Snap Detection**:
-   - Multi-stage kinematic tracking using MediaPipe Hand Landmarkers.
-   - Accurately tracks thumb, middle finger, and index finger relative velocities, contact pressure, and sudden release stroke into the palm.
-   - Rejects false positives (waving, fists, pinches, peace signs).
-   - Independent Left and Right hand detection with individual toggles.
-   - Configurable sensitivity slider, cooldown debounce, and visual on-screen indicator.
+| 1. Normal Live View | 2. Dust Disintegration in Action |
+| :---: | :---: |
+| ![Normal View](assets/screenshots/01_dashboard_normal.png) | ![Disintegration VFX](assets/screenshots/02_vfx_disintegration.png) |
+| *Live camera feed with character presets and biometric HUD.* | *Body dissolving into thousands of glowing golden embers & ash.* |
 
-2. **Accurate Person Segmentation & Real Background Preservation**:
-   - Powered by MediaPipe Neural Selfie Segmentation.
-   - Separates body, hair, clothes, and arms with feathered anti-aliased edge smoothing.
-   - **True Background Preservation**: Auto-accumulates and stitches uncovered background pixels over time, or allows instant 1-click calibration (`B` key).
-   - When you disappear, your actual room, furniture, and wall behind you remain visible—never a black screen or fake cut-out.
-
-3. **Cinematic Avengers Dust Particle Engine**:
-   - **Real Pixel Color Sampling**: Particles sample their base color directly from your actual clothes, skin, and hair pixels.
-   - **Mixed Media Particle Field**:
-     - *Sampled Body Pixels*: Real wardrobe and skin colors with contrast boost.
-     - *Golden Glowing Embers*: Additive bloom blending with high-energy amber cores (`RGB 255, 200, 60`).
-     - *Dark Carbon Ash*: Flaky dark gray and charcoal fragments (`RGB 45, 45, 50`).
-   - **Aerodynamic Simulation**:
-     - Dual-sine curl noise turbulence for organic swirling.
-     - Upward thermal buoyancy and lateral wind drift.
-     - Dynamic particle shrinkage, gravity, and power-law alpha decay.
-   - **Dissolution Wave & Burning Ember Rim**: The body erodes progressively from the snap point outwards with a glowing orange/gold edge rim.
-
-4. **Reverse Particle Swarm Reappearance**:
-   - Snap again to trigger reverse particle reconstruction.
-   - Thousands of glowing embers swirl from space back into your body coordinates, reforming you seamlessly.
-
-5. **Live Virtual Camera Support**:
-   - Direct integration via `pyvirtualcam` (OBS Virtual Camera compatible).
-   - Outputs live processed VFX feed into meeting software without watermarks or lag.
-
-6. **Professional Desktop Dashboard**:
-   - Built with PyQt6 with a dark Infinity War/Quantum-realm aesthetic.
-   - 4 Live monitors: Main Processed Output, Raw Camera, Person Mask, and Preserved Background Plate.
-   - Real-time FPS counter, gesture status badges, sensitivity sliders, duration controls, and particle density tuning.
+| 3. Pure Preserved Room Background | 4. Reverse Particle Reconstitution |
+| :---: | :---: |
+| ![Invisible Mode](assets/screenshots/03_vfx_invisible.png) | ![Reconstruction VFX](assets/screenshots/04_vfx_reconstruction.png) |
+| *Body completely removed; physical room background preserved.* | *Reverse particle swarm swirling back to reform the body.* |
 
 ---
 
-## 🛠️ Technology Stack
+## 🏛️ System Architecture
 
-- **Language**: Python 3.11 - 3.14
-- **Computer Vision**: OpenCV (`cv2`)
-- **Hand & Body AI**: MediaPipe Tasks Vision (`HandLandmarker`, `ImageSegmenter`)
-- **Particle & Physics**: NumPy (Fully vectorized array operations)
-- **Audio Engine**: Low-latency asynchronous sound synthesizer & Windows Native Audio
-- **Desktop UI**: PyQt6
-- **Virtual Camera Output**: PyVirtualCam
+The application is structured into decoupled, high-performance modular layers separating video ingestion, neural detection, vectorized simulation, compositing, broadcasting, and UI dispatch.
+
+```mermaid
+flowchart TD
+    subgraph INGESTION["1. Video Ingestion & Hardware"]
+        CAM["Webcam (DirectShow / OpenCV)"] --> THREAD["WebcamStream Worker Thread"]
+        THREAD --> BG_MGR["BackgroundManager (Plate Calibration)"]
+    end
+
+    subgraph DETECTION["2. AI Computer Vision Pipeline"]
+        THREAD --> SEG["PersonSegmenter (MediaPipe Neural Mask)"]
+        THREAD --> HANDS["HandTracker (21 3D Landmarks)"]
+        HANDS --> SNAP["SnapDetector (Biomechanical Kinematics)"]
+    end
+
+    subgraph VFX["3. Avengers Particle & VFX Engine"]
+        SNAP -- "Snap Event Trigger" --> STATE_MACH["State Machine Controller"]
+        STATE_MACH --> DISINT["DisintegrationController (Erosion Wave)"]
+        STATE_MACH --> REAPP["ReappearanceController (Inward Swarm)"]
+        DISINT --> ENGINE["Vectorized ParticleEngine (NumPy Physics)"]
+        REAPP --> ENGINE
+        SEG --> COMPOSITOR["VisualRenderer (Compositor)"]
+        BG_MGR --> COMPOSITOR
+        ENGINE --> COMPOSITOR
+    end
+
+    subgraph OUTPUT["4. UI & Virtual Broadcasting"]
+        COMPOSITOR --> GUI["PyQt6 Dashboard (4 Live Displays)"]
+        COMPOSITOR --> VCAM["VirtualCameraManager (DirectShow Filter)"]
+        VCAM --> MEETINGS["Google Meet / Zoom / MS Teams"]
+    end
+```
+
+### 🔁 Finite State Machine (FSM)
+
+```mermaid
+stateDiagram-v2
+    [*] --> NORMAL: Launch Application
+    NORMAL --> DISAPPEARING: Snap Detected / [SPACE]
+    DISAPPEARING --> INVISIBLE: Dissolution Progress >= 100%
+    INVISIBLE --> REAPPEARING: Snap Again / [R]
+    REAPPEARING --> NORMAL: Reconstruction Complete
+    
+    note right of NORMAL
+        Live camera displayed.
+        Auto-background accumulator active.
+        Biometric tension gauge monitors fingers.
+    end note
+    
+    note right of DISAPPEARING
+        Audio snap + wind sweep.
+        Active erosion wave peels across body.
+        Particles spawn from actual body pixels.
+        Burning amber edge glow applied.
+    end note
+
+    note right of INVISIBLE
+        Body completely removed.
+        Real physical room background preserved.
+        Lingering dust particles drift away.
+    end note
+
+    note right of REAPPEARING
+        Inward particle vortex swarm.
+        Reverse timeline materialization.
+        Energy shimmer seals body back into live feed.
+    end note
+```
+
+---
+
+## 📁 Complete Project Structure
+
+```
+snap-finger & Disappear/
+│
+├── main.py                         # Application entrypoint & CLI argument parser
+├── config.py                       # Global settings, constants, character presets, asset paths
+├── requirements.txt                # Production Python dependencies
+├── run.bat                         # 1-click Windows desktop launcher
+├── LICENSE                         # Official MIT Open-Source License (2026)
+├── README.md                       # Comprehensive system documentation & user guide
+├── .gitignore                      # Git exclusion rules (build caches, large binaries)
+│
+├── camera/                         # Video Hardware & Streaming Layer
+│   ├── __init__.py                 # Package init
+│   ├── webcam.py                   # Threaded OpenCV capture with auto-reconnection
+│   ├── virtual_camera.py           # PyVirtualCam output stream (OBS Virtual Camera backend)
+│   └── background_capture.py       # Auto-accumulator & clean room background preservation
+│
+├── detection/                      # AI Computer Vision & Kinematics Layer
+│   ├── __init__.py                 # Package init
+│   ├── hand_tracking.py            # MediaPipe HandLandmarker wrapper (21 3D landmarks, dual hands)
+│   ├── snap_detector.py            # Biomechanical finger-snap kinematics & velocity engine
+│   └── person_segmentation.py      # MediaPipe neural selfie segmentation with edge feathering
+│
+├── effects/                        # Particle Physics & Compositing Layer
+│   ├── __init__.py                 # Package init
+│   ├── particle_engine.py          # Vectorized NumPy particle simulation (dust, ash, glowing embers)
+│   ├── disintegration.py           # Wave-front peeling erosion & burning edge glow
+│   ├── reappearance.py             # Reverse particle vortex & body materialization
+│   ├── visual_renderer.py          # Master VFX compositor & state machine
+│   └── audio_manager.py            # Low-latency asynchronous sound player (snap, disintegrate, reappear)
+│
+├── interface/                      # PyQt6 User Interface Layer
+│   ├── __init__.py                 # Package init
+│   ├── styles.py                   # Quantum Realm dark theme stylesheet (QSS)
+│   ├── controls.py                 # Custom video monitors, biometric gauge, sliders, status pills
+│   └── dashboard.py                # Main PyQt6 window with 4 live previews, tabs, presets, HUD
+│
+├── assets/                         # Local Assets (100% Offline)
+│   ├── models/                     # Pre-downloaded MediaPipe neural task bundles
+│   │   ├── hand_landmarker.task             # Hand tracking model (7.8 MB)
+│   │   ├── selfie_segmenter.tflite          # Lightweight segmentation (250 KB)
+│   │   └── selfie_multiclass_256x256.tflite # High-definition multiclass model (16.3 MB)
+│   ├── sounds/                     # Synthesized 44.1kHz 16-bit PCM WAV audio effects
+│   │   ├── snap.wav                # Crisp snap transient with high-frequency pop & cosmic chime
+│   │   ├── disintegrate.wav        # Wind sweep, rumble, and crackling ember dissipation
+│   │   └── reappear.wav            # Reverse harmonic swell & energy lock-in pulse
+│   └── screenshots/                # Real captured application interface state images
+│       ├── 01_dashboard_normal.png
+│       ├── 02_vfx_disintegration.png
+│       ├── 03_vfx_invisible.png
+│       └── 04_vfx_reconstruction.png
+│
+└── tests/                          # Automated Unit Test Suite
+    ├── __init__.py                 # Package init
+    ├── test_snap_detector.py       # Kinematic tests (priming, separation speed, cooldown, handedness)
+    └── test_particle_engine.py     # Particle physics, buffer allocation, & rendering tests
+```
+
+---
+
+## 🔬 Core Engineering & Physics Principles
+
+### 1. Biomechanical Snap Gesture Detector
+A human finger snap is not merely bringing two fingers together; it involves distinct muscular phases:
+* **Contact & Compression (`PRIMED`)**:
+  Thumb pad (`Landmark 4`) and middle finger pad (`Landmark 12/11`) press together firmly. Hand size is normalized:
+  $$\text{hand\_scale} = \|\text{Wrist} - \text{Middle\_MCP}\|$$
+  Normalized contact distance must be $< 0.125$, held for consecutive frames.
+* **Explosive Release & Downward Stroke (`SNAP`)**:
+  The middle finger rapidly slips off the thumb with separation velocity:
+  $$\text{Velocity} = \frac{\Delta \text{dist}}{\Delta t} > \text{threshold}$$
+  Simultaneously, the middle fingertip strokes inward toward the palm/wrist (`Landmark 0`), while the index finger remains unclasped.
+* **Debounce Cooldown**:
+  A 1.25s debounce cooldown timer prevents accidental repeated triggers.
+
+### 2. Avengers Dust Disintegration VFX
+* **Pixel Color Sampling**: Particles sample their base color directly from the actual RGB pixels of your clothes, skin, and hair at the exact moment of dissolution.
+* **Mixed-Media Particle Composition**:
+  - *Sampled Body Fragments* (65%): Wardrobe and skin colors with contrast boost.
+  - *Golden Glowing Embers* (20%): Additive bloom blending with high-energy amber cores (`RGB 255, 200, 60`).
+  - *Dark Carbon Ash* (15%): Flaky charcoal gray particles (`RGB 45, 45, 50`).
+* **Aerodynamic Turbulence**: Particles are updated using dual-sine curl noise:
+  $$v_x(t) = \text{wind}_x + \sin(y \cdot 0.015 + \text{seed} + 3.5t) \cdot \text{turbulence}$$
+  $$v_y(t) = \text{buoyancy}_y + \cos(x \cdot 0.015 + \text{seed} + 3.0t) \cdot (\text{turbulence} \cdot 0.75)$$
+* **Peeling Erosion Wave**: Body dissolves progressively from the snap location outwards, accompanied by an intense orange/gold burning ember rim.
+
+### 3. Background Preservation
+* **True Room Integrity**: When you disappear, only the person is removed. The physical furniture, walls, and lighting behind you remain visible.
+* **Dual Capture Modes**:
+  1. *Automatic Accumulator*: Continuously samples unoccluded background pixels as you naturally move.
+  2. *Instant Calibration*: Step out of frame for 1 second and press <kbd>B</kbd> (or click **Lock Background**). Missing occluded areas are automatically filled using edge-aware inpainting (`cv2.INPAINT_TELEA`).
+
+---
+
+## 🎨 Infinity Stone Character Presets
+
+Switch presets live via the top header chips to dynamically alter the particle aesthetics:
+
+| Character Preset | Core Color | Secondary Color | Physics Style |
+| :--- | :--- | :--- | :--- |
+| **🪐 Thanos (Infinity War)** | Glowing Amber (`#f3ba2f`) | Hot Orange (`#ff6b35`) | High-velocity upward drift & dark ash flakes |
+| **🔮 Doctor Strange (Mystic)** | Eldritch Spark (`#ff8c00`) | Bright Gold (`#ffd700`) | High aerodynamic turbulence & intense bloom |
+| **🕷️ Spider-Man (Emotional)** | Soft Amber (`#f6ad55`) | Carbon Ash (`#4a5568`) | Gentle floating motes with slow decay |
+| **🔴 Scarlet Witch (Chaos)** | Crimson Red (`#e53e3e`) | Chaos Magenta (`#b83280`) | Swirling hex energy embers |
+| **🔷 Space Stone (Cosmic)** | Celestial Cyan (`#00f0ff`) | Electric Cobalt (`#3182ce`) | Rapid stardust dispersal |
 
 ---
 
 ## 🚀 Quick Start Guide
 
 ### 1. Installation
-
-Clone or extract the repository, open PowerShell or Terminal in the project directory, and install dependencies:
-
+Clone this repository and install dependencies:
 ```bash
+git clone https://github.com/ABIZER-web/snap-finger-Disappear.git
+cd snap-finger-Disappear
 pip install -r requirements.txt
 ```
 
-### 2. Launching the Application
-
-Run the main application:
-
+### 2. Launch the Application
+Simply double-click **`run.bat`** on Windows or execute:
 ```bash
 python main.py
 ```
 
-Optional Command-Line Arguments:
+Optional CLI parameters:
 ```bash
 python main.py --camera 0 --width 1280 --height 720 --sensitivity 0.75 --particles 12000
 ```
 
 ---
 
-## 🎮 Controls & Keyboard Shortcuts
+## 🌐 Virtual Camera Setup for Meetings
 
-| Key / Control | Action | Description |
-| :--- | :--- | :--- |
-| **Finger Snap** | **Disappear / Reappear** | Natural finger snap gesture in front of camera |
-| <kbd>SPACE</kbd> | **Disappear** | Manual trigger to start Avengers dust disintegration |
-| <kbd>R</kbd> | **Reappear** | Manual trigger to reverse-reconstruct your body |
-| <kbd>B</kbd> | **Capture Background** | Calibrates/locks the clean room background frame |
-| <kbd>ESC</kbd> | **Exit** | Closes the application safely |
-| **Emergency Restore** | **Instant Reset** | Instantly reverts back to visible camera feed |
+Broadcast the real-time Avengers dust disintegration directly into **Google Meet**, **Zoom**, and **Microsoft Teams**.
 
----
+### Driver Setup (One-Time)
+1. Run **`OBS-Studio-Installer.exe`** (or install OBS Studio from [obsproject.com](https://obsproject.com/)).
+2. Open OBS Studio once, click **Start Virtual Camera** (bottom right controls), then close OBS. *(This registers the Windows DirectShow virtual camera driver).*
+3. In Snap Disappear, click **🌐 Enable Virtual Camera**. The status badge will turn green: `VIRTUAL CAM: ACTIVE`.
 
-## 📷 Background Calibration (Best Results)
-
-To ensure your empty room looks 100% natural when you disappear:
-1. When starting the app, sit in your normal meeting position.
-2. The app **automatically learns** the background as you naturally move.
-3. For the **pristine cinematic shot**:
-   - Briefly lean or step out of the camera view for 1 second.
-   - Press <kbd>B</kbd> (or click **Recapture Background**).
-   - Step back in. The background is now permanently locked!
-
----
-
-## 🌐 Virtual Camera Setup (Zoom, Google Meet, Teams)
-
-### Prerequisites (Windows)
-1. Download and install **OBS Studio** (Free & Open Source from [obsproject.com](https://obsproject.com/)).
-2. Launch OBS Studio once, and click **Start Virtual Camera** (bottom right controls dock). You can then stop it or close OBS. This permanently registers the Windows virtual camera driver.
-
-### Enabling in Snap Disappear
-1. In the Snap Disappear dashboard, navigate to the **Camera & Streaming** card on the right.
-2. Click **🌐 Enable Virtual Camera**.
-3. The badge in the top right will change to `VIRTUAL CAM: ACTIVE`.
-
-### Selecting in Meeting Applications
+### Meeting Software Configuration:
 
 #### Google Meet:
 1. Join or start a Google Meet call.
-2. Click the **More Options** (3 dots) at the bottom $\rightarrow$ **Settings** $\rightarrow$ **Video**.
-3. Under **Camera**, select **OBS Virtual Camera** (or the registered virtual device).
+2. Click **More Options** (3 vertical dots at bottom) $\rightarrow$ **Settings** $\rightarrow$ **Video**.
+3. Under **Camera**, select **OBS Virtual Camera**.
 
 #### Zoom:
 1. Open Zoom Settings $\rightarrow$ **Video**.
-2. Under **Camera**, select **OBS Virtual Camera**.
-3. Uncheck *Mirror my video* if desired (Snap Disappear already mirrors the preview naturally).
+2. Under **Camera**, choose **OBS Virtual Camera**.
+3. *(Optional)* Uncheck *Mirror my video* (Snap Disappear already mirrors your preview naturally).
 
 #### Microsoft Teams:
-1. In Teams, go to **Settings** $\rightarrow$ **Devices**.
+1. In Teams, click your profile icon $\rightarrow$ **Settings** $\rightarrow$ **Devices**.
 2. Under **Camera**, choose **OBS Virtual Camera**.
 
 ---
 
-## 🔬 How the Finger Snap Detector Works
+## 🎮 Controls & Keyboard Shortcuts
 
-A real finger snap consists of distinct biomechanical phases:
-1. **Pinch & Friction Contact (`PRIMED`)**:
-   - The thumb pad (Landmark 4) and middle finger pad (Landmark 12/11) compress together.
-   - Hand scale normalization: `hand_scale = ||Wrist - Middle_MCP||`.
-   - Contact threshold: Normalized distance $< 0.12$.
-   - Held for at least 2 consecutive frames to build muscular tension.
-2. **Explosive Release & Downward Stroke (`FIRE`)**:
-   - The middle finger rapidly slides off the thumb pad and accelerates inward toward the palm / wrist.
-   - Velocity check: Separation speed $\frac{\Delta \text{dist}}{\Delta t} > \text{threshold}$.
-   - Handedness separation: Tracked independently for Left and Right hands.
-3. **Debounce Cooldown**:
-   - Once a snap fires, a 1.25s cooldown prevents accidental repeated triggers.
+| Control | Shortcut | Function |
+| :--- | :---: | :--- |
+| **Finger Snap** | *Gesture* | Snap fingers in front of webcam to disappear or reappear |
+| **Disappear** | <kbd>SPACE</kbd> | Manual hotkey to trigger particle disintegration |
+| **Reappear** | <kbd>R</kbd> | Manual hotkey to trigger reverse particle reconstruction |
+| **Lock Background** | <kbd>B</kbd> | Calibrates clean physical room background plate |
+| **Fullscreen** | <kbd>F11</kbd> | Toggles edge-to-edge cinematic theater mode |
+| **Exit** | <kbd>ESC</kbd> | Safely releases camera hardware and closes application |
+| **Emergency Restore** | *Button* | Instantly reverts to normal live webcam feed |
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Automated Testing
 
-Run the full automated test suite covering snap detection kinematics and particle physics:
-
+Run the full unit test suite covering kinematics, sensitivity thresholds, cooldowns, and particle physics:
 ```bash
 python -m unittest discover tests
 ```
-
 Output:
 ```text
-Ran 8 tests in 0.297s
+Ran 8 tests in 0.343s
 OK
 ```
 
 ---
 
-## 🛠️ Troubleshooting
+## 📄 License & Copyright
 
-- **Webcam not showing video**:
-  - In the **Camera & Streaming** panel, select a different **Camera Index** (e.g. index 1 or 2 if you have an external USB webcam).
-  - Check that other applications (like Windows Camera app) are not exclusively locking the webcam.
-- **Virtual Camera says "UNAVAILABLE"**:
-  - Ensure OBS Studio has been installed and its virtual camera driver registered.
-- **Snap not triggering easily**:
-  - Increase the **Snap Sensitivity** slider to `0.85` or `0.90`.
-  - Ensure your hand is well-lit and clearly visible within the camera frame.
-  - Or use the instant hotkey: <kbd>SPACE</kbd> to Disappear, <kbd>R</kbd> to Reappear.
-- **Low Frame Rate (FPS < 20)**:
-  - In the **Resolution** dropdown, select `640 x 480 (Fast)`.
-  - Lower the **Max Particle Count** slider to `5000`.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
----
-
-## 📜 License & Credits
-
-Built with ❤️ for cinematic VFX enthusiasts and Python developers.
-Inspired by Marvel Studios' *Avengers: Infinity War* & *Avengers: Endgame*.
-
+```text
+Copyright (c) 2026 ABIZER-web
+```
+Inspired by Marvel Studios' *Avengers: Infinity War* & *Avengers: Endgame*. Built with ❤️ for computer vision engineers and VFX creators.
