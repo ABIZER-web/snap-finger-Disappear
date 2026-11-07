@@ -170,11 +170,11 @@ snap-finger & Disappear/
 A human finger snap is not merely bringing two fingers together; it involves distinct muscular phases:
 * **Contact & Compression (`PRIMED`)**:
   Thumb pad (`Landmark 4`) and middle finger pad (`Landmark 12/11`) press together firmly. Hand size is normalized:
-  $$\text{hand\_scale} = \|\text{Wrist} - \text{Middle\_MCP}\|$$
+  $$\text{HandScale} = \|\mathbf{P}_{\text{Wrist}} - \mathbf{P}_{\text{MiddleMCP}}\|$$
   Normalized contact distance must be $< 0.125$, held for consecutive frames.
 * **Explosive Release & Downward Stroke (`SNAP`)**:
   The middle finger rapidly slips off the thumb with separation velocity:
-  $$\text{Velocity} = \frac{\Delta \text{dist}}{\Delta t} > \text{threshold}$$
+  $$\text{Velocity} = \frac{\Delta d}{\Delta t} > v_{\text{threshold}}$$
   Simultaneously, the middle fingertip strokes inward toward the palm/wrist (`Landmark 0`), while the index finger remains unclasped.
 * **Debounce Cooldown**:
   A 1.25s debounce cooldown timer prevents accidental repeated triggers.
@@ -186,8 +186,8 @@ A human finger snap is not merely bringing two fingers together; it involves dis
   - *Golden Glowing Embers* (20%): Additive bloom blending with high-energy amber cores (`RGB 255, 200, 60`).
   - *Dark Carbon Ash* (15%): Flaky charcoal gray particles (`RGB 45, 45, 50`).
 * **Aerodynamic Turbulence**: Particles are updated using dual-sine curl noise:
-  $$v_x(t) = \text{wind}_x + \sin(y \cdot 0.015 + \text{seed} + 3.5t) \cdot \text{turbulence}$$
-  $$v_y(t) = \text{buoyancy}_y + \cos(x \cdot 0.015 + \text{seed} + 3.0t) \cdot (\text{turbulence} \cdot 0.75)$$
+  $$v_x(t) = v_{\text{wind}, x} + \sin(0.015 y + \text{seed} + 3.5 t) \cdot \tau$$
+  $$v_y(t) = v_{\text{thermal}, y} + \cos(0.015 x + \text{seed} + 3.0 t) \cdot (0.75 \tau)$$
 * **Peeling Erosion Wave**: Body dissolves progressively from the snap location outwards, accompanied by an intense orange/gold burning ember rim.
 
 ### 3. Background Preservation
@@ -248,16 +248,16 @@ Broadcast the real-time Avengers dust disintegration directly into **Google Meet
 
 #### Google Meet:
 1. Join or start a Google Meet call.
-2. Click **More Options** (3 vertical dots at bottom) $\rightarrow$ **Settings** $\rightarrow$ **Video**.
+2. Click **More Options** (3 vertical dots at bottom) → **Settings** → **Video**.
 3. Under **Camera**, select **OBS Virtual Camera**.
 
 #### Zoom:
-1. Open Zoom Settings $\rightarrow$ **Video**.
+1. Open Zoom Settings → **Video**.
 2. Under **Camera**, choose **OBS Virtual Camera**.
 3. *(Optional)* Uncheck *Mirror my video* (Snap Disappear already mirrors your preview naturally).
 
 #### Microsoft Teams:
-1. In Teams, click your profile icon $\rightarrow$ **Settings** $\rightarrow$ **Devices**.
+1. In Teams, click your profile icon → **Settings** → **Devices**.
 2. Under **Camera**, choose **OBS Virtual Camera**.
 
 ---
