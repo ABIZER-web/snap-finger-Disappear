@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Large Installers
+*.exe
+OBS-Studio-Installer.exe
+
+# Environment & IDE
+.env
+.venv
+env/
+venv/
+.vscode/
+.idea/
+
+# OS generated
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary logs
+*.log

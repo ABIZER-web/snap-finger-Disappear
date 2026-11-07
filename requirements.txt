@@ -1,0 +1,16 @@
+# Core Computer Vision & AI Tracking
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Desktop User Interface
+PyQt6>=6.5.0
+
+# Virtual Camera Device Output
+pyvirtualcam>=0.11.0
+
+# Audio & Sound Processing
+sounddevice>=0.4.6
+soundfile>=0.12.1
+
